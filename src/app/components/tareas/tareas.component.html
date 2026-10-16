@@ -1,0 +1,45 @@
+<section class="task-section">
+  <div class="section-heading">
+    <div>
+      <h2>Mis tareas <span>{{ tareas.length }}</span></h2>
+      <p>Consulta actividades y registra tus avances.</p>
+    </div>
+    <div class="button-group"><button class="text-button" (click)="recargar.emit()" [disabled]="cargando">{{ cargando ?
+        'Cargando…' : '↻ Recargar' }}</button><button class="primary" (click)="nueva.emit()"
+        [disabled]="!tareas.length">Nueva entrega +</button></div>
+  </div>
+  <div class="filters task-filters"><label class="search"><span aria-hidden="true">⌕</span><input [(ngModel)]="buscando"
+        placeholder="Buscar por título de tarea" aria-label="Buscar por título de tarea"></label><select
+      [(ngModel)]="curso" aria-label="Filtrar por curso">
+      <option value="">Todos los cursos</option>@for (c of cursos; track c) {<option [value]="c">{{ c }}</option>}
+    </select><select [(ngModel)]="estado" aria-label="Filtrar por estado académico">
+      <option value="">Todos los estados</option>
+      <option>Pendiente</option>
+      <option>Completado</option>
+    </select><button class="text-button" (click)="limpiar()" [disabled]="!buscando && !curso && !estado">Limpiar
+      filtros</button></div>
+  @if (origenLocal) {<p class="local-notice">Mostrando el último catálogo guardado en este dispositivo.</p>}
+  @if (cargando) {<div class="empty" role="status">Cargando tus actividades…</div>}
+  @else if (fallo) {<div class="empty" role="alert">
+    <h3>El catálogo aún no está disponible</h3>
+    <p>Conéctate una primera vez y pulsa Recargar para guardarlo.</p>
+  </div>}
+  @else {
+  <p class="filter-results" aria-live="polite">{{ visibles.length }} de {{ tareas.length }} tareas</p>
+  @for (t of visibles; track t.id) {
+  <article class="task-card">
+    <div class="task-top"><span class="course-icon" [class.database]="t.id === 102" aria-hidden="true">{{ t.id === 101 ?
+        '⌘' : '▤' }}</span><span class="course">{{ t.curso }}</span><span class="badge"
+        [class.complete]="t.estado === 'Completado'">{{ t.estado }}</span></div>
+    <h3>{{ t.titulo }}</h3>
+    <p class="instructor">Instructor <strong>{{ t.instructor }}</strong></p>
+    <div class="task-footer"><span>◷ Entrega <strong>{{ t.fechaEntrega | date:'dd MMM yyyy':'':'es-PE'
+          }}</strong></span><button class="primary" (click)="elegir.emit(t)">{{ t.estado === 'Completado' ? 'Registrar
+        observación' : 'Registrar entrega' }} →</button></div>
+  </article>
+  } @empty {<div class="empty">
+    <h3>No hay coincidencias</h3>
+    <p>Prueba otro título o curso.</p><button class="text-button" (click)="limpiar()">Limpiar filtros</button>
+  </div>}
+  }
+</section>

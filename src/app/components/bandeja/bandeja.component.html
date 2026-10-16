@@ -1,0 +1,46 @@
+<section class="local-section">
+  <div class="section-heading">
+    <div>
+      <h2>Mis entregas locales <span>{{ entregas.length }}</span></h2>
+      <p>Guardadas en este navegador. Conectividad y sincronización son estados distintos.</p>
+    </div>
+    <div class="button-group"><button class="text-button" (click)="recargar.emit()" [disabled]="cargando">↻
+        Actualizar</button><button class="primary" (click)="exportar.emit()"
+        [disabled]="!entregas.length || !!errorLectura || cargando">Descargar respaldo ↓</button></div>
+  </div>
+  <div class="queue-status">
+    <div><strong>{{ pendientes }} pendientes de sincronización</strong>
+      <p>{{ online ? 'Con conexión: listo para intentar sincronizar.' : 'Sin conexión: tus registros permanecen en el
+        dispositivo.' }}</p><small>No hay API configurada. Un reintento local no envía datos ni cambia los
+        estados.</small>
+    </div><button class="secondary" (click)="reintentar.emit()"
+      [disabled]="!online || !pendientes || reintentando || !!errorLectura || cargando">{{ reintentando ? 'Revisando…' :
+      'Reintentar sincronización' }}</button>
+  </div>
+  @if(errorLectura) {<div class="empty" role="alert">
+    <h3>No se pudo leer la bandeja</h3>
+    <p>{{ errorLectura }}</p>
+    <p>El último listado visible puede estar desactualizado.</p><button class="primary" (click)="recargar.emit()">Volver
+      a consultar</button>
+  </div>}
+  @else if(cargando) {<p role="status">Consultando los registros persistidos…</p>}
+  @else {
+  @for(e of entregas; track e.id) {<article class="delivery">
+    <div class="delivery-top"><span class="eyebrow">{{ e.tipo }} · ID LOCAL #{{ e.id }}</span><span class="badge"
+        [class.complete]="e.estadoSincronizacion === 'SINCRONIZADO'"
+        [class.failed]="e.estadoSincronizacion === 'ERROR'">{{ e.estadoSincronizacion }}</span></div>
+    <h3>{{ e.tituloTarea }}</h3>
+    <p class="muted">{{ e.curso }} · Tarea #{{ e.tareaId }} · {{ e.usuario }}</p>
+    <p class="comment comment-preview">{{ e.comentario }}</p>
+    <div class="delivery-bottom"><span>Guardado {{ e.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+      <div class="button-group"><button class="text-button" (click)="detalle.emit(e.id)">Ver detalle →</button><button
+          class="danger-text" (click)="eliminar.emit(e.id)">Eliminar registro</button></div>
+    </div>
+  </article>}
+  @empty {<div class="empty">
+    <h3>Tu espacio de entregas está listo</h3>
+    <p>Selecciona una tarea y guarda tu primer comentario.</p><button class="primary" (click)="nueva.emit()">Nueva
+      entrega +</button>
+  </div>}
+  }
+</section>

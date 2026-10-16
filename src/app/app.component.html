@@ -1,0 +1,173 @@
+<div class="shell">
+    <aside class="sidebar">
+        <a class="brand" href="./" aria-label="SENATI TaskHub inicio"><span
+                class="brand-mark">S</span><span>SENATI<small>TaskHub · Campus virtual</small></span></a>
+        <span class="nav-label">ESPACIO ACADÉMICO</span>
+        <nav aria-label="Navegación principal">
+            <button [class.active]="vista === 'dashboard'" (click)="vista = 'dashboard'"><span>◫</span> Mi
+                dashboard</button>
+            <button [class.active]="vista === 'tareas'" (click)="vista = 'tareas'"><span>☷</span> Tareas académicas
+                <b>{{ tareas.length }}</b></button>
+            <button [class.active]="vista === 'entregas'" (click)="vista = 'entregas'"><span>▣</span> Mis entregas
+                locales <b>{{ pendientesLocales }}</b></button>
+        </nav>
+        <div class="side-bottom">
+            <div class="local-card"><span class="shield">✓</span><strong>Tu trabajo, contigo</strong>
+                <p>Registra tus avances incluso cuando estés sin conexión.</p>
+            </div>
+            <div class="profile"><span class="avatar">ES</span>
+                <div>Estudiante SENATI<small>Tecnologías de la Información</small></div>
+            </div>
+        </div>
+    </aside>
+    <div class="workspace">
+        <header>
+            <div class="breadcrumb">Campus virtual <span>/</span> {{ vista === 'dashboard' ? 'Mi dashboard' : vista ===
+                'tareas' ? 'Tareas académicas' : 'Mis entregas locales' }}</div>
+            <div class="header-actions"><span class="connection" [class.offline]="!online" role="status"><i></i>{{
+                    online ? 'ONLINE' : 'OFFLINE' }}</span>@if (promptInstalacion) {<button class="install"
+                    (click)="instalar()">Instalar app ↓</button>} @if (instalada) {<span class="muted">App instalada
+                    ✓</span>}<span class="avatar small">ES</span></div>
+        </header>
+        <main>
+            @if (!online) {<div class="offline-banner" role="status"><strong>Estás sin conexión.</strong> Consulta las
+                tareas almacenadas y guarda tus entregas en este dispositivo.</div>}
+            @if(recuperoConexion && online) {<div class="reconnect-banner" role="status">
+                <div><strong>Recuperaste la conexión.</strong><br>Revisa tus {{ pendientesLocales }} pendientes. Aún no
+                    se han enviado a un servidor.</div>
+                <div class="button-group"><button class="secondary" (click)="reintentar()"
+                        [disabled]="reintentando || !pendientesLocales">Reintentar sincronización</button><button
+                        class="close-link" (click)="recuperoConexion = false"
+                        aria-label="Cerrar aviso de conexión">×</button></div>
+            </div>}
+            <div class="page-title">
+                <div>
+                    <p class="eyebrow">SENATI TASKHUB / TECNOLOGÍAS DE LA INFORMACIÓN</p>
+                    <h1>{{ vista === 'dashboard' ? 'Tu aprendizaje sigue.' : vista === 'tareas' ? 'Tareas académicas' :
+                        'Tus entregas locales' }}</h1>
+                    <p>{{ vista === 'entregas' ? 'Comentarios y observaciones guardados en este navegador.' : 'Organiza
+                        tus tareas, registra tus avances y continúa donde estés.' }}</p>
+                </div><span class="term">PERIODO ACADÉMICO <strong>2026 · II</strong></span>
+            </div>
+            @if (vista === 'dashboard') {
+            <section class="hero">
+                <div><span class="hero-label">APRENDE SIN INTERRUPCIONES</span>
+                    <h2>Conectado a tus metas.<br>Incluso sin Internet.</h2>
+                    <p>Tu espacio para consultar actividades y guardar entregas académicas con tranquilidad.</p><button
+                        class="hero-button" (click)="vista = 'tareas'">Explorar mis tareas <span>→</span></button>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                    <div class="art-ring"></div>
+                    <div class="art-card"><span>✓</span>
+                        <div>Mi próxima meta<small>Un avance a la vez</small></div><i></i><i></i><i></i>
+                    </div>
+                    <div class="art-badge">GUARDADO LOCAL ✓</div>
+                </div>
+            </section>
+            <section class="stats" aria-label="Resumen académico">
+                <article><span>Total de tareas</span><strong>{{ tareas.length }}</strong><small>Actividades del
+                        catálogo</small><i>☷</i></article>
+                <article><span>Por completar</span><strong>{{ pendientes }}</strong><small>Estado académico
+                        pendiente</small><i class="amber">◷</i></article>
+                <article><span>Completadas</span><strong>{{ completadas }}</strong><small>Según el catálogo
+                        académico</small><i class="green">✓</i></article>
+                <article><span>Entregas pendientes</span><strong>{{ pendientesLocales }}</strong><small>{{ errorLectura
+                        ? 'Contador sin actualizar' : 'Guardadas en IndexedDB' }}</small><i>▣</i></article>
+            </section>
+            }
+            @if (vista !== 'entregas') {
+            <div class="content-grid"><app-tareas [tareas]="tareas" [cargando]="cargando" [fallo]="falloCatalogo"
+                    [origenLocal]="origenLocal" (elegir)="abrir($event)" (nueva)="abrir()"
+                    (recargar)="cargarTareas()" />
+                <aside class="info-column">
+                    <section class="progress-panel"><span class="eyebrow">TU PROGRESO ACADÉMICO</span>
+                        <div class="progress-circle"><strong>{{ tareas.length ? (completadas / tareas.length * 100 |
+                                number:'1.0-0') : 0 }}<small>%</small></strong></div>
+                        <h3>Vas por buen camino</h3>
+                        <p>{{ completadas }} de {{ tareas.length }} actividades completadas.</p>
+                        <div class="progress-track"><span
+                                [style.width.%]="tareas.length ? completadas / tareas.length * 100 : 0"></span></div>
+                    </section>
+                    <section class="storage-panel"><span class="eyebrow">ENTREGAS EN ESTE DISPOSITIVO</span>
+                        <h3>{{ pendientesLocales }} pendientes</h3>
+                        <p>{{ entregas.length }} registros locales. Con conexión no significa sincronizado: sin una API
+                            real, las entregas permanecen PENDIENTE.</p>@if(errorLectura) {<p
+                            class="storage-read-error">No se pudo actualizar el contador.</p>}<button
+                            class="text-button" (click)="vista = 'entregas'">Consultar mi bandeja →</button>
+                    </section>
+                </aside>
+            </div>
+            } @else {
+            <app-bandeja [entregas]="entregas" [pendientes]="pendientesLocales" [online]="online"
+                [cargando]="leyendoEntregas" [errorLectura]="errorLectura" [reintentando]="reintentando"
+                (detalle)="verDetalle($event)" (eliminar)="pedirEliminar($event)" (recargar)="cargarEntregas()"
+                (reintentar)="reintentar()" (exportar)="exportar()" (nueva)="abrir()" />
+            }
+
+            <footer>SENATI TaskHub <span>Gestión académica · Offline-First</span></footer>
+        </main>
+    </div>
+</div>
+@if (mensaje) {<div class="toast" [class.error]="error" role="alert"><span>{{ mensaje }}</span><button
+        (click)="mensaje = ''" aria-label="Cerrar notificación">×</button></div>}
+@if (formularioAbierto) {<app-entrega-form [tareas]="tareas" [tareaInicial]="seleccion" [guardando]="guardando"
+    [errorGuardado]="errorGuardado" (cancelar)="cerrar()" (registrar)="guardar($event)" />}
+@if (detalle; as e) {<div class="modal-backdrop" (click)="detalle = null">
+    <section appDialog class="modal" role="dialog" aria-modal="true" aria-labelledby="detalle-title"
+        (click)="$event.stopPropagation()" (keydown.escape)="detalle = null">
+        <div class="modal-heading"><span class="eyebrow">{{ e.tipo }} · REGISTRO LOCAL #{{ e.id }}</span><button
+                class="close-link" (click)="detalle = null" aria-label="Cerrar detalle">×</button></div>
+        <h2 id="detalle-title" class="detail-title">{{ e.tituloTarea }}</h2><span class="badge"
+            [class.complete]="e.estadoSincronizacion === 'SINCRONIZADO'">{{ e.estadoSincronizacion }}</span>
+        <dl class="detail-meta">
+            <div>
+                <dt>Tarea relacionada</dt>
+                <dd>#{{ e.tareaId }}</dd>
+            </div>
+            <div>
+                <dt>Curso</dt>
+                <dd>{{ e.curso }}</dd>
+            </div>
+            <div>
+                <dt>Usuario</dt>
+                <dd>{{ e.usuario }}</dd>
+            </div>
+            <div>
+                <dt>Fecha de registro</dt>
+                <dd>{{ e.fechaRegistro | date:'dd/MM/yyyy HH:mm:ss' }}</dd>
+            </div>
+            <div>
+                <dt>Intentos remotos</dt>
+                <dd>{{ e.intentosSincronizacion }}</dd>
+            </div>
+            <div>
+                <dt>Tipo</dt>
+                <dd>{{ e.tipo }}</dd>
+            </div>
+            <div class="wide">
+                <dt>Identificador del registro</dt>
+                <dd>{{ e.idRegistro }}</dd>
+            </div>@if(e.ultimoError) {<div class="wide">
+                <dt>Último error</dt>
+                <dd>{{ e.ultimoError }}</dd>
+            </div>}
+        </dl>
+        <h3>Comentario u observación</h3>
+        <p class="comment">{{ e.comentario }}</p>
+        <p class="form-note">Sin API, revisar la cola no realiza un intento remoto ni cambia el estado.</p>
+        <div class="form-actions"><button class="danger-text" (click)="pedirEliminar(e.id)">Eliminar
+                registro</button><button class="secondary" (click)="reintentar(e.id)"
+                [disabled]="!online || reintentando || e.estadoSincronizacion !== 'PENDIENTE'">{{ reintentando ?
+                'Revisando…' : 'Reintentar sincronización' }}</button></div>
+    </section>
+</div>}
+@if (eliminarId !== null) {<div class="modal-backdrop">
+    <section appDialog class="modal compact" role="alertdialog" aria-modal="true" aria-labelledby="delete-title"
+        (keydown.escape)="cancelarEliminacion()">
+        <h2 id="delete-title">¿Eliminar el registro #{{ eliminarId }}?</h2>
+        <p>Se eliminará de este dispositivo. Puedes descargar un respaldo antes de continuar.</p>
+        <div class="form-actions"><button class="secondary" (click)="cancelarEliminacion()"
+                [disabled]="eliminando">Cancelar</button><button class="danger" (click)="eliminar()"
+                [disabled]="eliminando">{{ eliminando ? 'Eliminando…' : 'Confirmar eliminación' }}</button></div>
+    </section>
+</div>}

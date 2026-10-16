@@ -1,0 +1,71 @@
+SENATI TaskHub PWA - Ampliación Proyecto 2
+Fecha UTC: 2026-10-16T15:43:05.593919+00:00
+Entorno: v24.19.0
+
+
+> senati-taskhub-pwa@1.1.0 check
+> npm run build -- --configuration production && npm run verify && npm test
+
+
+> senati-taskhub-pwa@1.1.0 build
+> ng build --configuration production
+
+❯ Building...
+✔ Building...
+Initial chunk files   | Names         |  Raw size | Estimated transfer size
+main-GBCF3XBE.js      | main          | 316.90 kB |                83.67 kB
+polyfills-5CFQRCPP.js | polyfills     |  34.59 kB |                11.33 kB
+styles-RUUCRIHG.css   | styles        |  16.83 kB |                 3.99 kB
+
+                      | Initial total | 368.31 kB |                99.00 kB
+
+Application bundle generation complete. [2.277 seconds]
+
+Output location: /workspace/scratch/f3efc255b988/taskhub-ampliacion/senati-taskhub-pwa/dist/senati-taskhub-pwa
+
+
+> senati-taskhub-pwa@1.1.0 verify
+> node scripts/verify-build.mjs
+
+OK: Angular Service Worker emitido, App Shell, runtime performance 1d/50, manifest e iconos 192/512, datos del PDF.
+
+> senati-taskhub-pwa@1.1.0 test
+> node --test scripts/storage.test.mjs
+
+✔ Migración v1 → v2 conserva id, fecha y comentario y añade título, índices e intentos (17.238474ms)
+✔ T1 / TH-01: búsqueda por título, curso y estado funcionan individualmente y combinados (1.230677ms)
+✔ T2 / TH-02: formulario vacío, tarea inválida, espacios y longitudes muestran validaciones específicas (1.708353ms)
+✔ T3 y T8 / TH-03 y TH-04: guarda offline relación, fecha, id local y estado PENDIENTE tras commit (2.581432ms)
+✔ T4 / TH-03: una nueva instancia de servicio y aplicación recupera el registro persistido (4.961946ms)
+✔ T5 / TH-05: contador derivado de IndexedDB excluye ERROR y SINCRONIZADO (8.468044ms)
+✔ T6 / TH-07: pedir y cancelar eliminación conserva; confirmar elimina y actualiza contador (1.946754ms)
+✔ T7 / TH-06: Offline → Online actualiza indicador y ofrece reintento sin cambiar estados ni intentos (2.853193ms)
+✔ TH-08: fallo al guardar conserva formulario y comentario y no confirma éxito (1.338556ms)
+✔ TH-08: error de lectura se informa sin vaciar silenciosamente la última bandeja (1.169367ms)
+✔ Persistencia: validar también en el servicio impide tareas inválidas y comentarios vacíos (0.8739ms)
+✔ Idempotencia: doble clic y repetición del mismo idRegistro no crean registros duplicados (1.572843ms)
+✔ Formulario: una tarea seleccionada muestra contexto y usa el mismo idRegistro al reintentar (0.238993ms)
+✔ Aplicación: bloquea doble envío y consulta detalle directamente desde IndexedDB (0.951726ms)
+✔ Aplicación: guardado confirmado y fallo posterior de lectura no invitan a duplicar la entrega (0.787122ms)
+✔ Sin API: reintento offline, sin pendientes y detalle inexistente tienen resultados explícitos (0.757178ms)
+✔ Offline-First: catálogo de respaldo se conserva y se recupera ante error HTTP (1.010102ms)
+✔ Error al eliminar: no se cierra confirmación ni se descuenta un registro que sigue persistido (0.914621ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 742.189762
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+Código de salida: 0
+
+Alcance: build de producción, validación estática de recursos PWA y 18 pruebas de lógica/persistencia con fake-indexeddb.
+No se ejecutaron pruebas de navegador ni se generaron capturas reales de DevTools en este entorno.
+La suite Playwright se entrega para ejecución local; no se informa como aprobada.

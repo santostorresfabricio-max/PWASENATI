@@ -1,0 +1,38 @@
+<div class="modal-backdrop" (click)="cerrar()">
+  <section appDialog class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+    (click)="$event.stopPropagation()" (keydown.escape)="cerrar()">
+    <div class="modal-heading"><span class="eyebrow">REGISTRO ACADÉMICO LOCAL</span><button (click)="cerrar()"
+        [disabled]="guardando" aria-label="Cerrar formulario">×</button></div>
+    <h2 id="modal-title">Registrar avance</h2>
+    <form (ngSubmit)="enviar()" novalidate>
+      <label for="tarea">Tarea académica</label><select id="tarea" name="tarea" [(ngModel)]="tareaId"
+        [disabled]="guardando" [attr.aria-invalid]="!!validacion.tarea" aria-describedby="error-tarea">
+        <option [ngValue]="null">Selecciona una tarea</option>@for(t of tareas; track t.id) {<option [ngValue]="t.id">{{
+          t.titulo }}</option>}
+      </select>
+      @if(validacion.tarea) {<p class="field-error" id="error-tarea" role="alert">{{ validacion.tarea }}</p>}
+      @if(seleccionada; as tarea) {<p class="selected-task"><strong>{{ tarea.curso }}</strong><br>{{ tarea.instructor }}
+        · Entrega: {{ tarea.fechaEntrega }} · {{ tarea.estado }}</p>}
+      <label for="usuario">Nombre del estudiante o instructor</label><input id="usuario" name="usuario"
+        [(ngModel)]="usuario" [disabled]="guardando" maxlength="120" [attr.aria-invalid]="!!validacion.usuario"
+        aria-describedby="error-usuario">
+      @if(validacion.usuario) {<p class="field-error" id="error-usuario" role="alert">{{ validacion.usuario }}</p>}
+      <label for="tipo">Tipo de registro</label><select id="tipo" name="tipo" [(ngModel)]="tipo" [disabled]="guardando">
+        <option>Entrega</option>
+        <option>Observación</option>
+      </select>
+      <label for="comentario">Comentario u observación</label><textarea id="comentario" name="comentario"
+        [(ngModel)]="comentario" [disabled]="guardando" rows="5" maxlength="5000"
+        placeholder="Describe tu entrega o registra una observación…" [attr.aria-invalid]="!!validacion.comentario"
+        aria-describedby="error-comentario"></textarea>
+      @if(validacion.comentario) {<p class="field-error" id="error-comentario" role="alert">{{ validacion.comentario }}
+      </p>}
+      <small>{{ comentario.length }} / 5000 caracteres</small>
+      @if(errorGuardado) {<p class="field-error" role="alert">{{ errorGuardado }}</p>}
+      <p class="form-note">Se guardará en este dispositivo con estado PENDIENTE. No se enviará a un servidor.</p>
+      <div class="form-actions"><button type="button" class="secondary" (click)="cerrar()"
+          [disabled]="guardando">Cancelar</button><button type="submit" class="primary" [disabled]="guardando">{{
+          guardando ? 'Guardando…' : 'Guardar registro local' }}</button></div>
+    </form>
+  </section>
+</div>
